@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Versiones | Visor Docs</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
+            animation: fadeIn 1s ease-out 0.5s backwards;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .info-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .info-list li strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .tag {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .versions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .version-row {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .version-row.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .version-row:nth-child(even) {
+            grid-template-columns: 1.5fr 1fr;
+            direction: rtl;
+        }
+
+        .version-row:nth-child(even) .version-info {
+            direction: ltr;
+            /* Reset text direction for content */
+        }
+
+        .version-row:nth-child(even) .version-preview {
+            border-radius: 20px 0 20px 20px;
+        }
+
+        .version-info {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .version-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .version-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            pointer-events: none;
+        }
+
+        .version-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .version-prompt {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            white-space: pre-wrap;
+        }
+
+        .version-preview {
+            width: 100%;
+            height: 500px;
+            background: #1e293b;
+            border-radius: 0 20px 20px 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .version-preview:hover {
+            transform: scale(1.02);
+        }
+
+        .version-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            z-index: 10;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1024px) {
+
+            .version-row,
+            .version-row:nth-child(even) {
+                grid-template-columns: 1fr;
+                direction: ltr;
+            }
+
+            .version-row:nth-child(even) .version-preview {
+                border-radius: 20px;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Historial de Evolución</h1>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <h2>IAs Utilizadas</h2>
+                <ul class="info-list">
+                    <li>
+                        <strong>Gemini 3 Pro</strong>
+                        <span class="tag">v1 - v15</span>
+                    </li>
+                    <li>
+                        <strong>Claude Opus 3.5</strong>
+                        <span class="tag">v16 - v35</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h2>APIs Implementadas</h2>
+                <ul class="info-list">
+                    <li>
+                        <strong>IndexedDB (Nativo)</strong>
+                        <span class="tag">v15</span>
+                    </li>
+                    <li>
+                        <strong>OpenStreetMap (Nominatim)</strong>
+                        <span class="tag">v17</span>
+                    </li>
+                    <li>
+                        <strong>Open-Meteo (Weather)</strong>
+                        <span class="tag">v17</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h2>Curiosidades Técnicas</h2>
+                <ul class="info-list">
+                    <li>
+                        <strong>Pseudo-FileSystem</strong>
+                        <span class="tag">RAM + IDB</span>
+                    </li>
+                    <li
+                        style="display: block; font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 1rem; opacity: 0.7;">
+                        Los archivos viven en RAM y persisten en IndexedDB, simulando un disco duro local sin servidor.
+                    </li>
+                    <li>
+                        <strong>Markdown Engine</strong>
+                        <span class="tag">Regex Custom</span>
+                    </li>
+                    <li style="display: block; font-size: 0.9rem; margin-top: -0.5rem; opacity: 0.7;">
+                        Motor de renderizado MD escrito desde cero usando solo Expresiones Regulares, sin librerías.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="versionsContainer" class="versions-container">
+            <!-- Versions will be injected here via JS -->
+        </div>
+    </div>
+
+    <script>
+        const versionsData = [
+            { id: 1, prompt: "Necesito que crees una aplicación en la que podamos subir archivos tipo:\nTexto\nPDF\nMarkdown\nJSON\n...\nNecesito que utilices html, css y js nativos. Nada de frameworks." },
+            { id: 2, prompt: "necesito poder hacer clic en un archivo y que se abra una \"vista previa\" " },
+            { id: 3, prompt: "añade la posibilidad de editar los archivos de texto plano, como txt, md y json" },
+            { id: 4, prompt: "ahora necesito que los archivos .md estén formateados para que se vean bonitos" },
+            { id: 5, prompt: "la vista previa de los md aparece así, arreglalo" },
+            { id: 6, prompt: "al abrir el readme_basico.md, por ejemplo, aparecen justo antes de los \"#\" una contrabarra " },
+            { id: 7, prompt: "Arregla esto, tienes que abarcar todo tipo de caracter que se pueda escribir en un .md, coge como ejemplo los MDs de github" },
+            { id: 8, prompt: "añádele colores a los .json, para que se sienta como un editor profesional" },
+            { id: 9, prompt: "añade un apartado de configuración. En el se puede cambiar el tema de la aplicación, aumentar o disminuir el tamaño de la letra (archivos y página general) con un slidebar. Recuerda añadir temas para el modo oscuro y unos totalmente diferentes para el modo claro." },
+            { id: 10, prompt: "Implementa la navegación entre archivos. Debe ser multiplataforma, por lo que tiene que haber flechas para \"siguiente\" y \"anterior\" y para pc usar las flechas del teclado. Añade también atajos de teclado para realizar funciones en la aplicación." },
+            { id: 11, prompt: "Hay un mal diseño en el modo claro de la aplicación: las letras son claras y el fondo también, por lo que no hay un buen contraste entre ambos. Arreglalo" },
+            { id: 12, prompt: "los txt se ven así, pon las letras un poco más oscuras para poder leer con claridad" },
+            { id: 13, prompt: "necesito poder filtrar y ordenar los archivos" },
+            { id: 14, prompt: "tienes que cambiar el color de las letras dentro de la lista desplegable de \"ordenar por\", para ver qué pone en cada opción" },
+            { id: 15, prompt: "Actualmente, todo vive en la memoria RAM (fileContents Map y uploadedFiles array).\nProblema: Si recargas la página, pierdes todos los archivos y ediciones.\nMejora: Implementar IndexedDB (usando una librería ligera como idb-keyval o Dexie.js). Esto permitiría que los archivos \"subidos\" persistan entre sesiones sin necesidad de un servidor backend." },
+            { id: 16, prompt: "Si el usuario decide volver a subir archivos con el mismo nombre, la aplicación debe preguntar si quiere \"reemplazar\" u \"omitir\". También debe tener un checkbox que diga \"hacer lo mismo con todos los archivos\"" },
+            { id: 17, prompt: "Añade unos widgets en el header:\n1. Ubicación: necesito saber mi ubicación actual en todo momento.\n2. Tiempo: Necesito ver qué tiempo hace en la ubicación en la que estoy. Se tiene que ver de un vistazo, es decir, que el icono del widget aparezca con icono soleado, nublado, lluvioso, tormenta...\n3. Fecha y hora actuales: La fecha con formato DD/MM/AAAA y la hora con formato HH:MM:SS" },
+            { id: 18, prompt: "Ahora necesito añadir el © en el footer, pon algo ingenioso. Me llamo Iván López Benítez" },
+            { id: 19, prompt: "Arregla el fallo con los png" },
+            { id: 20, prompt: "A la hora de editar los archivos de texto plano, necesito poder utilizar las funcionalidades comunes de todos los editores de texto, como usar las flechas para moverme entre caracteres, mantener mayus para seleccionarlos, añadir control para ir palabra a palabra...\nAñade la información sobre los atajos de edición de texto a la app" },
+            { id: 21, prompt: "Los PDFs no se visualizan" },
+            { id: 22, prompt: "Añade una gestión por carpetas, estilo explorador de archivos de windows 11. Incluye esa esencia minimalista y visualmente atractiva" },
+            { id: 23, prompt: "Necesito poder ver las carpetas en un modal distinto al del de archivos, utiliza un modal flotante estilo acordeon. Permite al usuario mover los archivos subidos adentro de las carpetas utilizando funcionalidades de arrastrado y un aspecto \"flotante\"" },
+            { id: 24, prompt: "La accesibilidad de las carpetas debe ser únicamente desde el menú dedicado. Las carpetas no deben verse en el centro. También necesito poder abrir los archivos desde la carpeta en el menú derecho\nLos archivos del directorio raíz deben visualizarse en el centro. La idea es que el usuario lo tenga todo a mano en la aplicación" },
+            { id: 25, prompt: "Añade menús contextuales para gestionar el menú lateral de la derecha (eliminar/renombrar carpetas y archivos...)" },
+            { id: 26, prompt: "Añade alguna animación, como a la hora de arrastrar archivos" },
+            { id: 27, prompt: "añade un efecto de drag al mover un archivo del raíz a una carpeta, debe verse como se mueve el archivo físicamente" },
+            { id: 28, prompt: "Añade, en el menú contextual, la opción de \"vaciar\" las carpetas, para poder mover todos los archivos contenidos a la carpeta raíz" },
+            { id: 29, prompt: "el desplazamiento entre archivos debe estar separado por carpetas. Por ejemplo: si abro una imagen de la carpeta imágenes y le doy a siguiente, me mueve a la siguiente imagen" },
+            { id: 30, prompt: "Necesito poder descargarme el archivo/carpeta enteros para mejorar la portabilidad física." },
+            { id: 31, prompt: "Añade la opción de vaciar todo el directorio raíz, eliminando los archivos subidos" },
+            { id: 32, prompt: "Añade redundancia de opciones. Por ejemplo, añade el menú contextual de gestión de archivos a los archivos centrales en la raíz de la aplicación. También necesito tener el menú contextual de las carpetas accesible desde la carpeta \"raíz\", añadiendo las funciones de la raíz" },
+            { id: 33, prompt: "Permite que el usuario mueva los archivos de una carpeta directamente al centro (raíz) de la aplicación" },
+            { id: 34, prompt: "Fix: no deja" },
+            { id: 35, prompt: "Arregla el contador total de archivos de la raíz" }
+        ];
+
+        const container = document.getElementById('versionsContainer');
+
+        versionsData.forEach(version => {
+            const row = document.createElement('div');
+            row.className = 'version-row';
+
+            row.innerHTML = `
+                <div class="version-info">
+                    <div class="version-number">v${version.id}</div>
+                    <div class="version-title">
+                        <span>Versión ${version.id}</span>
+                        ${getAIBadge(version.id)}
+                    </div>
+                    <div class="version-prompt">${formatPrompt(version.prompt)}</div>
+                </div>
+                <div class="version-preview">
+                    <div class="loading-overlay">Cargando Previsualización...</div>
+                    <iframe 
+                        data-src="versiones/v${version.id}.html" 
+                        class="version-frame" 
+                        title="Versión ${version.id}"
+                        loading="lazy"
+                        allow="geolocation 'none'; microphone 'none'; camera 'none'"
+                        onload="this.previousElementSibling.style.display='none'">
+                    </iframe>
+                </div>
+            `;
+
+            container.appendChild(row);
+        });
+
+        function getAIBadge(id) {
+            let aiName = id <= 15 ? 'Gemini 3 Pro' : 'Claude Opus 3.5';
+            let color = id <= 15 ? '#60a5fa' : '#c084fc';
+            return `<span class="tag" style="background: ${color}20; color: ${color};">${aiName}</span>`;
+        }
+
+        function formatPrompt(text) {
+            return text.replace(/\\n|\n/g, '<br>');
+        }
+
+        // Intersection Observer for scroll animations and lazy loading
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Trigger iframe load if not already loaded
+                    const iframe = entry.target.querySelector('iframe');
+                    if (iframe && !iframe.src) {
+                        iframe.src = iframe.getAttribute('data-src');
+                    }
+
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: "0px 0px 100px 0px"
+        });
+
+        document.querySelectorAll('.version-row').forEach(row => {
+            observer.observe(row);
+        });
+
+    </script>
+</body>
+
+</html>

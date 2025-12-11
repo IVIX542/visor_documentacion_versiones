@@ -1,0 +1,119 @@
+IAs utilizadas: Gemini 3 Pro (v1-v15), Claude Opus 3.5 (v16-v35)
+
+v1
+Necesito que crees una aplicación en la que podamos subir archivos tipo:
+Texto
+PDF
+Markdown
+JSON
+...
+Necesito que utilices html, css y js nativos. Nada de frameworks.
+
+v2
+necesito poder hacer clic en un archivo y que se abra una "vista previa"
+
+v3
+añade la posibilidad de editar los archivos de texto plano, como txt, md y json
+
+v4
+ahora necesito que los archivos .md estén formateados para que se vean bonitos
+
+v5
+la vista previa de los md aparece así, arreglalo
+
+v6
+al abrir el readme_basico.md, por ejemplo, aparecen justo antes de los "#" una contrabarra
+
+v7
+Arregla esto, tienes que abarcar todo tipo de caracter que se pueda escribir en un .md, coge como ejemplo los MDs de github
+
+v8
+añádele colores a los .json, para que se sienta como un editor profesional
+
+v9
+añade un apartado de configuración. En el se puede cambiar el tema de la aplicación, aumentar o disminuir el tamaño de la letra (archivos y página general) con un slidebar. Recuerda añadir temas para el modo oscuro y unos totalmente diferentes para el modo claro.
+
+v10
+Implementa la navegación entre archivos. Debe ser multiplataforma, por lo que tiene que haber flechas para "siguiente" y "anterior" y para pc usar las flechas del teclado. Añade también atajos de teclado para realizar funciones en la aplicación.
+
+v11
+Hay un mal diseño en el modo claro de la aplicación: las letras son claras y el fondo también, por lo que no hay un buen contraste entre ambos. Arreglalo
+
+v12
+los txt se ven así, pon las letras un poco más oscuras para poder leer con claridad
+
+v13
+necesito poder filtrar y ordenar los archivos
+
+v14
+tienes que cambiar el color de las letras dentro de la lista desplegable de "ordenar por", para ver qué pone en cada opción
+
+v15
+Actualmente, todo vive en la memoria RAM (fileContents Map y uploadedFiles array).
+Problema: Si recargas la página, pierdes todos los archivos y ediciones.
+Mejora: Implementar IndexedDB (usando una librería ligera como idb-keyval o Dexie.js). Esto permitiría que los archivos "subidos" persistan entre sesiones sin necesidad de un servidor backend.
+
+v16
+Si el usuario decide volver a subir archivos con el mismo nombre, la aplicación debe preguntar si quiere "reemplazar" u "omitir". También debe tener un checkbox que diga "hacer lo mismo con todos los archivos"
+
+v17
+Añade unos widgets en el header:
+1. Ubicación: necesito saber mi ubicación actual en todo momento.
+2. Tiempo: Necesito ver qué tiempo hace en la ubicación en la que estoy. Se tiene que ver de un vistazo, es decir, que el icono del widget aparezca con icono soleado, nublado, lluvioso, tormenta...
+3. Fecha y hora actuales: La fecha con formato DD/MM/AAAA y la hora con formato HH:MM:SS
+
+v18
+Ahora necesito añadir el &copy en el footer, pon algo ingenioso. Me llamo Iván López Benítez
+
+v19
+Arregla el fallo con los png
+
+v20
+A la hora de editar los archivos de texto plano, necesito poder utilizar las funcionalidades comunes de todos los editores de texto, como usar las flechas para moverme entre caracteres, mantener mayus para seleccionarlos, añadir control para ir palabra a palabra...
+Añade la información sobre los atajos de edición de texto a la app
+
+v21
+Los PDFs no se visualizan
+
+v22
+Añade una gestión por carpetas, estilo explorador de archivos de windows 11. Incluye esa esencia minimalista y visualmente atractiva
+
+v23
+Necesito poder ver las carpetas en un modal distinto al del de archivos, utiliza un modal flotante estilo acordeon. Permite al usuario mover los archivos subidos adentro de las carpetas utilizando funcionalidades de arrastrado y un aspecto "flotante"
+
+v24
+La accesibilidad de las carpetas debe ser únicamente desde el menú dedicado. Las carpetas no deben verse en el centro. También necesito poder abrir los archivos desde la carpeta en el menú derecho
+Los archivos del directorio raíz deben visualizarse en el centro. La idea es que el usuario lo tenga todo a mano en la aplicación
+
+v25
+Añade menús contextuales para gestionar el menú lateral de la derecha (eliminar/renombrar carpetas y archivos...)
+
+v26
+Añade alguna animación, como a la hora de arrastrar archivos
+
+v27
+añade un efecto de drag al mover un archivo del raíz a una carpeta, debe verse como se mueve el archivo físicamente
+
+v28
+Añade, en el menú contextual, la opción de "vaciar" las carpetas, para poder mover todos los archivos contenidos a la carpeta raíz
+
+v29
+el desplazamiento entre archivos debe estar separado por carpetas. Por ejemplo: si abro una imagen de la carpeta imágenes y le doy a siguiente, me mueve a la siguiente imagen
+
+v30
+Necesito poder descargarme el archivo/carpeta enteros para mejorar la portabilidad física.
+
+v31
+Añade la opción de vaciar todo el directorio raíz, eliminando los archivos subidos
+
+v32
+Añade redundancia de opciones. Por ejemplo, añade el menú contextual de gestión de archivos a los archivos centrales en la raíz de la aplicación. También necesito tener el menú contextual de las carpetas accesible desde la carpeta "raíz", añadiendo las funciones de la raíz
+
+v33
+Permite que el usuario mueva los archivos de una carpeta directamente al centro (raíz) de la aplicación
+
+v34
+Fix: no deja
+
+v35
+Arregla el contador total de archivos de la raíz
